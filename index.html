@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style type="text/css">
+		*{
+			padding: 0;
+			margin: 0;
+			box-sizing: border-box;
+			font-family: monospace;
+		}
+
+		body{
+			padding: 30px 20px;
+			overflow-y: auto;
+		}
+
+		body::-webkit-scrollbar{
+			display: none;
+		}
+
+		input{
+			width: 100%;
+			margin: 5px 0;
+			padding: 5px;
+		}
+	</style>
+</head>
+<body>
+	<h2>variaveis de decisão</h2>
+
+	<br>
+
+	<p>variaveis de decisão 1</p>
+
+	<label>custo por unidade da restrição 1</label>
+	<input type="number" name="" value="0" id="1"><br>
+
+	<label>custo por unidade da restrição 2</label>
+	<input type="number" name="" value="0" id="2"><br>
+
+	<label>lucro por unidade da decisão 1</label>
+	<input type="number" name="" value="0" id="3"><br>
+
+	<br>
+	<br>
+	<hr>
+	<br>
+
+	<p>variaveis de decisão 2</p>
+
+	<label>custo por unidade da restrição 1</label>
+	<input type="number" name="" value="0" id="4"><br>
+
+	<label>custo por unidade da restrição 2</label>
+	<input type="number" name="" value="0" id="5"><br>
+
+	<label>lucro por unidade da decisão 1</label>
+	<input type="number" name="" value="0" id="6"><br>
+
+	<br>
+	<br>
+	<hr>
+	<br>
+
+
+	<h2>restrições</h2>
+
+	<br>
+
+	<label>restrição 1</label>
+	<input type="number" name="" value="0" id="7">
+
+	<br>
+	<br>
+	<hr>
+	<br>
+
+	<label>restrição 2</label>
+	<input type="number" name="" value="0" id="8">
+
+	<br>
+	<h2>calcular</h2>
+	<br>
+	<input type="button" name="" value="calcular" onclick="funcionar();">
+	<br>
+	<br>
+	<label id="9">variavel de decisão 1: 0</label><br>
+	<label id="10">variavel de decisão 2: 0</label><br><br>
+	<label id="11">lucro d1 R$: 0.00 / lucro d2 R$: 0.00 / lucro totais R$: 0.00</label>
+
+
+
+	<script type="text/javascript">
+		//variaveis de decisão
+		var d1 = 0;
+		var d2 = 0;
+
+		//variaveis de lucro
+		var l1 = 0;
+		var l2 = 0;
+
+		//variaveis de restrição
+		var r1 = 0;
+		var r2 = 0;
+
+		//variaveis de custo restrição
+		var d1r1 = 0;
+		var d1r2 = 0;
+		var d2r1 = 0;
+		var d2r2 = 0;
+
+
+		function maximo_d1(){
+			//calculo com r1 de d1
+			var x1 = Math.floor(r1 / d1r1);
+
+			//calculo com r2 de d1
+			var x2 = Math.floor(r2 / d1r2);
+
+			//retornando o maximo possivel
+			if(x1 < x2){
+				return x1;
+			} else{
+				return x2;
+			}
+		}
+
+		function setar_lucro_maximo(x1, x2){
+			if((x1*l1 + x2*l2) > (d1*l1 + d2*l2)){
+				d1 = x1;
+				d2 = x2;
+			}
+
+			return;
+		}
+
+		function maximo_d2(base_sobra){
+			//variaveis de produção de d2
+			var x1 = 0;
+			var x2 = 0;
+
+			//sobra de restrição
+			var s1 = 0;
+			var s2 = 0;
+
+			//definindo as sobras
+			s1 = r1 - (base_sobra*d1r1);
+			s2 = r2 - (base_sobra*d1r2);
+
+			//calculo com s1 de d2
+			x1 = Math.floor(s1 / d2r1);
+
+			//calculo com s2 de d2
+			x2 = Math.floor(s2 / d2r2);
+
+			//retornando o maximo possivel
+			if(x1 < x2){
+				return x1;
+			} else{
+				return x2;
+			}
+		}
+
+		function loop(){
+			var t_d1 = maximo_d1();
+			var t_d2 = maximo_d2(t_d1);
+
+			//tratando erros, produto infinito. d1
+			if(d1r1 == 0 && d1r2 == 0){
+				return;
+			}
+
+			//tratando erros, produto infinito. d2
+			if(d2r1 == 0 && d2r2 == 0){
+				return;
+			}
+
+			//tratando erros. não há como fazer d1
+			if(maximo_d1() == 0 && maximo_d2(0) == 0){
+				return;
+			}
+
+			//estartando o loop
+			//no caso t_d1 começa com max e t_d2 com 0
+			//a cada iteração rodo o set lucro
+			//subtraio 1 de t_d1, seto t_d2 para o novo maximo correspondente.
+			//seto o lucro, paro quando t_d1 chegar a 0.
+
+			while(true){
+				setar_lucro_maximo(t_d1, t_d2);
+				t_d1 --;
+				t_d2 = maximo_d2(t_d1);
+
+				console.log("interação: "+t_d1);
+				console.log("d1: "+t_d1+" d2: "+t_d2);
+
+				//quebra de loop
+				if(t_d1 <= 0){
+					break;
+				}
+			}
+		}
+
+		function funcionar(){
+			d1r1 = parseInt(document.getElementById('1').value);
+			d1r2 = parseInt(document.getElementById('2').value);
+			l1 = parseInt(document.getElementById('3').value);
+
+			d2r1 = parseInt(document.getElementById('4').value);
+			d2r2 = parseInt(document.getElementById('5').value);
+			l2 = parseInt(document.getElementById('6').value);
+
+			r1 = parseInt(document.getElementById('7').value);
+			r2 = parseInt(document.getElementById('8').value);
+
+			loop();
+
+			document.getElementById('9').innerHTML = "variavel de decisão 1: " + d1 + " UN";
+			document.getElementById('10').innerHTML = "variavel de decisão 2: " + d2 + " UN";
+			document.getElementById('11').innerHTML = "lucro d1 R$: "+(d1*l1).toFixed(2)+" / lucro d2 R$: "+(d2*l2).toFixed(2)+" / lucro totais R$: "+(d1*l1 + d2*l2).toFixed(2);
+
+
+		}
+
+		console.log(maximo_d1());
+		console.log(maximo_d2(0));
+		console.log(maximo_d2(1));
+
+		loop();
+
+		console.log("d1: "+d1);
+		console.log("d2: "+d2);
+	</script>
+</body>
+</html>
